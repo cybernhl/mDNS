@@ -14,15 +14,40 @@ const val PROTOCOL_TYPE_SELF_DEFINE = "_myservice"
 const val SERVICE_TYPE_USER_SELF_DEFINE_UDP_LOCAL = "_myservice._udp local."
 
 fun getProtocolOverTansportLayer(// ex : _http._tcp.
-    service: String = PROTOCOL_TYPE_WEBSOCKET,
-    protocol: String = TRANSPORT_LAYER_TYPE_TCP
+    protocol: String = PROTOCOL_TYPE_WEBSOCKET,
+    transport_layer: String = TRANSPORT_LAYER_TYPE_TCP
 ): String {
-    return service.plus(".").plus(protocol).plus(".")
+    return protocol.plus(".").plus(transport_layer).plus(".")
 }
 
 fun getProtocolOverTansportLayerLocal( //ex : _http._tcp.local.
-    service: String = PROTOCOL_TYPE_WEBSOCKET,
-    protocol: String = TRANSPORT_LAYER_TYPE_TCP
+    protocol: String = PROTOCOL_TYPE_WEBSOCKET,
+    transport_layer: String = TRANSPORT_LAYER_TYPE_TCP
 ): String {
-    return service.plus(".").plus(protocol).plus(".").plus(LAN_TYPE).plus(".")
+    return protocol.plus(".").plus(transport_layer).plus(".").plus(LAN_TYPE).plus(".")
+}
+
+fun mapToString(map: Map<String, Any>): String {
+    return map.entries.joinToString(", ") { "${it.key}=${it.value}" }
+}
+
+fun stringToMap(input: String): Map<String, Any> {
+    val regex = """(\w+)[:=]([^,]+)""".toRegex()
+    val matches = regex.findAll(input)
+//    if (matches.sumOf { it.groups.size - 1 } * 2 != input.split(',').size * 2) {
+//        return emptyMap()
+//    }
+    if (matches.none()) {
+        return emptyMap()
+    }
+
+    return matches.associate { matchResult ->
+        val (key, value) = matchResult.destructured
+        val parsedValue: Any = when {
+            value.toIntOrNull() != null -> value.toInt()
+            value.toBooleanStrictOrNull() != null -> value.toBooleanStrict()
+            else -> value
+        }
+        key to parsedValue
+    }
 }

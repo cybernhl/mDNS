@@ -1,7 +1,9 @@
 package com.deepseek.chat.developer.android
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.cybernhl.stringToMap
 import com.github.cybernhl.utils.getInetAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,24 +19,38 @@ class MainViewModel : ViewModel() {
             val jmdns = JmDNS.create(getInetAddress()).let { it ->
                 it.addServiceListener(serviceType, object : ServiceListener {
                     override fun serviceAdded(event: ServiceEvent) {
-                        println("Service added: " + event.info)
+                        Log.v("mDNS", "Service added: " + event.info)
                         it.requestServiceInfo(event.type, event.name, true)
                     }
 
                     override fun serviceResolved(event: ServiceEvent) {
-                        println("Found Service")
-                        println("Service resolved: " + event.info)
                         val serviceType = event.type
                         val serviceName = event.name
-                        val addresses = event.info.hostAddresses
-                        println("Name: $serviceName")
-                        println("Type: $serviceType")
-                        println("Address: ${addresses.joinToString()}")
-                        println("Port: ${event.info.port}")
+                        val addresses = event.info.hostAddresses.joinToString()
+                        val sb = StringBuilder()
+                        sb.appendLine(
+                            """
+    Resolved Found Device
+    --------------------------------------------
+    Service Name  : $serviceName
+    Service Type  : $serviceType
+    Address       : $addresses
+    Port          : ${event.info.port}
+    """.trimIndent()
+                        )
+
+                        if (event.info.hasData()) {
+                            sb.append("Service Extra Data\n")
+                            stringToMap(event.info.niceTextString).forEach { (key, value) ->
+                                sb.append("$key=$value , \n ")
+                            }
+                            sb.setLength(sb.length - 2)
+                        }
+                        Log.e("mDNS", sb.toString())
                     }
 
                     override fun serviceRemoved(event: ServiceEvent) {
-                        println("Service removed: " + event.info)
+                        Log.v("mDNS", "Service removed: " + event.info)
                     }
                 })
                 it.addServiceTypeListener(object : ServiceTypeListener {

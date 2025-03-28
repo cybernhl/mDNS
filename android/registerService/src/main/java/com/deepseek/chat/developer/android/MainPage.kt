@@ -3,6 +3,7 @@ package com.deepseek.chat.developer.android
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.deepseek.chat.developer.android.databinding.FragmentMainBinding
 import com.github.cybernhl.getProtocolOverTansportLayer
+import java.net.ServerSocket
+import java.util.UUID
 import kotlin.getValue
 
 //class MainPage : Fragment() {
@@ -62,9 +65,9 @@ import kotlin.getValue
 
 @Composable
 fun MainPage(viewmodel: MainViewModel = viewModel()) {
-    var serviceName by remember { mutableStateOf("MyService") }
+    var serviceName by remember { mutableStateOf("Android${UUID.randomUUID()}") }
     var serviceType by remember { mutableStateOf(getProtocolOverTansportLayer()) }
-    var port by remember { mutableStateOf("3389") }
+    var port by remember { mutableStateOf("${ServerSocket(0).localPort}") }
     Scaffold(
 
     ) { padding ->

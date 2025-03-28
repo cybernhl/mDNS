@@ -65,7 +65,7 @@ import com.github.cybernhl.getProtocolOverTansportLayerLocal
 fun MainPage(viewmodel: MainViewModel = viewModel()) {
     var serviceName by remember { mutableStateOf("MyService") }
     var serviceType by remember { mutableStateOf(getProtocolOverTansportLayerLocal()) }
-    Scaffold() { padding ->
+    Scaffold { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -74,7 +74,7 @@ fun MainPage(viewmodel: MainViewModel = viewModel()) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val context = LocalContext.current
-            (context.getSystemService(Context.WIFI_SERVICE) as WifiManager).let { wifi->
+            (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).let { wifi->
                 wifi.createMulticastLock("my_multicastLock")?.apply {
                     setReferenceCounted(true)
                     acquire()
@@ -83,13 +83,13 @@ fun MainPage(viewmodel: MainViewModel = viewModel()) {
             OutlinedTextField(
                 value = serviceName,
                 onValueChange = { serviceName = it },
-                label = { Text("Service Name") },
+                label = { Text("Target Service Name") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = serviceType,
                 onValueChange = { serviceType = it },
-                label = { Text("Service Type") },
+                label = { Text("Target Service Type") },
                 modifier = Modifier.fillMaxWidth()
             )
             Button(

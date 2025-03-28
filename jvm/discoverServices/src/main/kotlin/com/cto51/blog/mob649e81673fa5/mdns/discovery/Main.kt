@@ -1,6 +1,7 @@
 package com.cto51.blog.mob649e81673fa5.mdns.discovery
 
 import com.github.cybernhl.getProtocolOverTansportLayerLocal
+import com.github.cybernhl.stringToMap
 import java.io.IOException
 import java.net.InetAddress
 import java.net.UnknownHostException
@@ -27,16 +28,29 @@ fun main() {
                 }
 
                 override fun serviceResolved(event: ServiceEvent) {
-                    println("Found Service")
-                    println("Service resolved: " + event.info)
                     val serviceType = event.type
                     val serviceName = event.name
-                    val addresses = event.info.hostAddresses
-                    println("Name: $serviceName")
-                    println("Type: $serviceType")
-                    println("Address: ${addresses.joinToString()}")
-                    println("Port: ${event.info.port}")
+                    val addresses = event.info.hostAddresses.joinToString()
+                    val sb = StringBuilder()
+                    sb.appendLine(
+                        """
+    Resolved Found Device
+    --------------------------------------------
+    Service Name  : $serviceName
+    Service Type  : $serviceType
+    Address       : $addresses
+    Port          : ${event.info.port}
+    """.trimIndent()
+                    )
 
+                    if (event.info.hasData()) {
+                        sb.append("Service Extra Data\n")
+                        stringToMap(event.info.niceTextString).forEach { (key, value) ->
+                            sb.append("$key=$value , \n ")
+                        }
+                        sb.setLength(sb.length - 2)
+                    }
+                    println(sb.toString())
                 }
             })
             it.addServiceTypeListener(object : ServiceTypeListener {
