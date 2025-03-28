@@ -3,6 +3,9 @@ plugins {
     kotlin("jvm")
 }
 
+apply(plugin = "java")
+apply(plugin = "com.gradleup.shadow")
+
 group = "com.cto51.blog.mob649e81673fa5.mdns.server"
 version = "0.0.1"
 
